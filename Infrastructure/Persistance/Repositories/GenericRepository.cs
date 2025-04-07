@@ -27,5 +27,19 @@ namespace Persistance.Repositories
 
         public void Delete(TEntity entity)=>
             _dbContext.Set<TEntity>().Remove(entity);
+
+        public async Task<TEntity?> GetByIdAsync(Specifications<TEntity> specifications)
+        {
+            return await ApplySpecifications(specifications).FirstOrDefaultAsync();
+        }
+
+        public async Task<IEnumerable<TEntity>> GetAllAsync(Specifications<TEntity> specifications)
+        {
+            return await ApplySpecifications(specifications).ToListAsync();
+        }
+        private IQueryable<TEntity> ApplySpecifications(Specifications<TEntity> specifications)
+        {
+            return SpecificationEvaluator.GetQuery<TEntity>(_dbContext.Set<TEntity>(), specifications);
+        }
     }
 }
