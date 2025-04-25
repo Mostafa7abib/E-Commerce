@@ -10,5 +10,7 @@ namespace Services.Absraction
     {
         //Signature Of ProductServices
         public IProductService ProductService { get;}
+        //Signature Of BasketServices
+        public IBasketService BasketService { get; }
     }
 }

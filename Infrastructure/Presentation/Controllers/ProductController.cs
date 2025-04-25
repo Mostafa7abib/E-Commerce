@@ -21,9 +21,9 @@ namespace Presentation.Controllers
         }
         //Get All Products [EndPoints]
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<ProductResultDto>>> GetAllProducts(string? sort, int? brandId, int? typeId)
+        public async Task<ActionResult<PaginatedResult<ProductResultDto>>> GetAllProducts([FromQuery]ProductParametersSpecifications parameters)
         {
-            var products = await _serviceManager.ProductService.GetAllProductsAsync(sort , brandId , typeId);
+            var products = await _serviceManager.ProductService.GetAllProductsAsync(parameters);
             return Ok(products);
         }
         //Get All Brands [EndPoints]

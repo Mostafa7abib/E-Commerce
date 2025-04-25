@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Domain.Contracts;
 using Domain.Entities;
+using Shared;
 
 namespace Services.Specifications
 {
@@ -15,22 +16,25 @@ namespace Services.Specifications
             AddInclude(product => product.ProductBrand);
             AddInclude(product => product.ProductType);
         }
-        public ProductWithBrandAndTypeSpecifications(string? sort , int? brandId , int? typeId) :base(product=>(!brandId.HasValue || product.BrandId == brandId.Value)&&
-        (!typeId.HasValue || product.TypeId == typeId.Value))
+        public ProductWithBrandAndTypeSpecifications(ProductParametersSpecifications parameters)
+            :base(product=>
+        (!parameters.BrandId.HasValue || product.BrandId == parameters.BrandId.Value)&&
+        (!parameters.TypeId.HasValue || product.TypeId == parameters.TypeId.Value)&&
+        (string.IsNullOrWhiteSpace(parameters.Search)||product.Name.ToLower().Contains(parameters.Search.ToLower().Trim())))
         {
             AddInclude(product => product.ProductBrand);
             AddInclude(product => product.ProductType);
-            if (!string.IsNullOrWhiteSpace(sort))
+            if (parameters.Sort is not null)
             {
-                switch (sort.ToLower().Trim())
+                switch (parameters.Sort)
                 {
-                    case "pricedesc":
+                    case ProductSortOptions.PriceDesc:
                         SetOrderByDesc(product => product.Price);
                         break;
-                    case "priceasc":
+                    case ProductSortOptions.PriceAsc:
                         SetOrderBy(product => product.Price);
                         break;
-                    case "namedesc":
+                    case ProductSortOptions.NameDesc:
                         SetOrderByDesc(product => product.Name);
                         break;
                     default:
@@ -38,6 +42,7 @@ namespace Services.Specifications
                         break;
                 }
             }
+            ApplyPagination(parameters.PageIndex, parameters.PageSize);
         }
     }
 }

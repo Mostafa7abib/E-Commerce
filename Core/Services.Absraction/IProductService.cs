@@ -10,7 +10,7 @@ namespace Services.Absraction
         // 4) Get Product By Id
         //DTOs ==> Data Transfer Object 
         // 1) Get All Products
-        public Task<IEnumerable<ProductResultDto>> GetAllProductsAsync(string? sort, int? brandId, int? typeId);
+        public Task<PaginatedResult<ProductResultDto>> GetAllProductsAsync(ProductParametersSpecifications parameters);
         // 2) Get Product By Id
         public Task<ProductResultDto> GetProductByIdAsync(int id);
         // 3) Get All Brands
