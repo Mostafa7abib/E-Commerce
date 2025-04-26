@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Domain.Entities
 {
-    public class BaseEntity<Tkey>
+    public abstract class BaseEntity<Tkey>
     {
         public Tkey Id { get; set; }
     }

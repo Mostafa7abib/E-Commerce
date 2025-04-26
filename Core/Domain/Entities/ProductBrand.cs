@@ -10,5 +10,8 @@ namespace Domain.Entities
     {
         //public int Id { get; set; } inherited from BaseEntity
         public string Name { get; set; }
+        #region Relation
+        //Navigational property [Many {Products}]
+        #endregion
     }
 }
