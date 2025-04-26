@@ -3,15 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Services.Absraction;
 using Shared;
 
 namespace Presentation.Controllers
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    public class ProductController : ControllerBase
+    [Authorize]
+    public class ProductController : ApiController
     {
         private readonly IServiceManager _serviceManager;
 

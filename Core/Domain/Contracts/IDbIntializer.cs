@@ -3,5 +3,6 @@
     public interface IDbIntializer
     {
         Task IntializeAsync();
+        Task IntializeIdentityAsync();
     }
 }

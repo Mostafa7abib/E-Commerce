@@ -4,6 +4,13 @@ using Persistance.Data;
 using Persistance.Repositories;
 using Microsoft.EntityFrameworkCore;
 using StackExchange.Redis;
+using Persistance.Identity;
+using Domain.Entities;
+using Microsoft.AspNetCore.Identity;
+using Shared;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace E_Commerce.Extensions
 {
@@ -12,15 +19,51 @@ namespace E_Commerce.Extensions
         public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddDbContext<ApplicationDbContext>(options =>
-            { 
+            {
                 options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
             });
+            services.AddDbContext<IdentityAppDBContext>(options =>
+            {
+                options.UseSqlServer(configuration.GetConnectionString("IdentityConnection"));
+            });
+            services.AddIdentity<User, IdentityRole>(options =>
+            {
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequireDigit = true;
+                options.Password.RequireUppercase = false;
+                options.Password.RequireLowercase = false;
+                options.User.RequireUniqueEmail = true;
+            }).AddEntityFrameworkStores<IdentityAppDBContext>();
             services.AddScoped<IDbIntializer, DbIntializer>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IBasketRepository, BasketRepository>();
-            services.AddSingleton<IConnectionMultiplexer>(services=>
+            services.AddSingleton<IConnectionMultiplexer>(services =>
             ConnectionMultiplexer.Connect(configuration.GetConnectionString("Redis")!)
             );
+            services.ConfigureJwt(configuration);
+            return services;
+        }
+        public static IServiceCollection ConfigureJwt(this IServiceCollection services, IConfiguration configuration)
+        {
+            var jwtOptions = configuration.GetSection("JwtOptins").Get<JwtOptins>();
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidIssuer = jwtOptions.Issuer,
+                    ValidAudience = jwtOptions.Audience,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.Key)),
+                };
+            });
+            services.AddAuthorization();
             return services;
         }
     }

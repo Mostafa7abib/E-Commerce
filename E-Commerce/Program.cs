@@ -23,7 +23,7 @@ namespace E_Commerce
             // Presentation Services
             builder.Services.AddPresentationServices();
             // Core Services
-            builder.Services.AddCoreServices();
+            builder.Services.AddCoreServices(builder.Configuration);
             // Infrastructure Services
             builder.Services.AddInfrastructureServices(builder.Configuration);
             #endregion
@@ -42,7 +42,7 @@ namespace E_Commerce
             app.UseStaticFiles();
 
             app.UseHttpsRedirection();
-
+            app.UseAuthentication();
             app.UseAuthorization();
 
 
